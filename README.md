@@ -1,0 +1,3 @@
+# Todd's Emacs Config #
+
+I'm primarily a web developer so this config reflects that.  This is a living repository that grows over the years as I grow in my emacs development usage and tooling.  More documentation to come...
