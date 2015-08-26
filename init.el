@@ -84,6 +84,7 @@
 (global-linum-mode 1)
 (global-prettify-symbols-mode +1)
 (global-set-key [backspace] 'delete-backward-char)
+(setq tab-width 4)
 
 
 ;; (setq magit-last-seen-setup-instructions "1.4.0")
@@ -96,7 +97,6 @@
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
- '(coffee-tab-width 4)
  '(custom-safe-themes
    (quote
     ("2e5705ad7ee6cfd6ab5ce81e711c526ac22abed90b852ffaf0b316aa7864b11f" default)))
@@ -150,7 +150,7 @@
 
 (setq js2-highlight-level 3)
 ;; (setq js-indent-level 2)
-(setq js2-basic-offset 2)
+(setq js2-basic-offset 4)
 (setq js2-bounce-indent-p t)
 (setq js2-missing-semi-one-line-override t)
 (setq js2-strict-missing-semi-warning nil)
@@ -186,6 +186,7 @@
           (lambda () (flycheck-mode t)))
 
 ;;; coffeescript
+(setq coffee-tab-width 4)
 (add-hook 'coffee-mode-hook
           (lambda () (flycheck-mode t)))
 
@@ -289,15 +290,7 @@
   '(define-key cider-mode-map (kbd "C-c C-d") 'ac-nrepl-popup-doc))
 
 ;; Clojure Coding Standards
-
-(require 'whitespace)
-
 (add-to-list 'auto-mode-alist '("\\.boot\\'" . clojure-mode))
-
-(add-hook 'clojure-mode-hook (lambda () (whitespace-mode t)))
-(add-hook 'clojurescript-mode-hook (lambda () (whitespace-mode t)))
-(setq whitespace-style '(face lines-tail trailing))
-(setq whitespace-line-column 84)
 
 ;; indent hiccup, expectations,
 (define-clojure-indent
@@ -339,3 +332,13 @@
 (add-hook 'web-mode-hook 'emmet-mode)
 (add-hook 'emmet-mode-hook (lambda () (setq emmet-indentation 2)))
 (setq emmet-move-cursor-between-quotes t)
+
+;; whitespace
+(require 'whitespace)
+(add-hook 'clojure-mode-hook (lambda () (whitespace-mode t)))
+(add-hook 'clojurescript-mode-hook (lambda () (whitespace-mode t)))
+(add-hook 'js2-mode-hook (lambda () (whitespace-mode t)))
+(add-hook 'coffee-mode-hook (lambda () (whitespace-mode t)))
+(setq whitespace-style '(face lines-tail trailing))
+(setq whitespace-line-column 84)
+(setq whitespace-action '(auto-cleanup))
