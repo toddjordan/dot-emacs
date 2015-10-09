@@ -84,7 +84,12 @@
 (global-linum-mode 1)
 (global-prettify-symbols-mode +1)
 (global-set-key [backspace] 'delete-backward-char)
+(global-set-key (kbd "C-x O") 'previous-multiframe-window)
 (setq tab-width 4)
+(setq ispell-program-name "/usr/local/bin/aspell")
+
+(require 'yasnippet)
+(yas-reload-all)
 
 
 ;; (setq magit-last-seen-setup-instructions "1.4.0")
@@ -101,7 +106,8 @@
    (quote
     ("2e5705ad7ee6cfd6ab5ce81e711c526ac22abed90b852ffaf0b316aa7864b11f" default)))
  '(inhibit-startup-screen t)
- '(magit-commit-arguments nil))
+ '(magit-commit-arguments nil)
+ '(org-startup-truncated nil))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
@@ -112,6 +118,9 @@
 ;; (load-theme 'tsdh-dark)
 (add-to-list 'custom-theme-load-path "~/.emacs.d/themes/")
 (load-theme 'zenburn)
+
+;;; Org Mode
+(add-hook 'org-mode-hook 'yas-minor-mode)
 
 ;;; NeoTree
 (add-to-list 'load-path "/Users/jordanto/dev/emacs/emacs-neotree")
@@ -144,7 +153,8 @@
 (require 'js2-mode)
 (add-to-list 'auto-mode-alist '("\\.json$" . json-mode))
 (add-to-list 'auto-mode-alist '("\\.js$" . js2-mode))
-;; (add-hook 'js-mode-hook 'js2-minor-mode)
+(add-hook 'js2-mode-hook 'rainbow-delimiters-mode)
+(add-hook 'js2-mode-hook 'yas-minor-mode)
 ;; (add-hook 'js2-mode-hook 'skewer-mode)
 ;; (add-hook 'js2-mode-hook 'ac-js2-mode)
 
@@ -157,11 +167,11 @@
 
 
 ;; ;; tern auto complete
-(add-hook 'js2-mode-hook (lambda () (tern-mode t)))
-(eval-after-load 'tern
-  '(progn
-     (require 'tern-auto-complete)
-     (tern-ac-setup)))
+;; (add-hook 'js2-mode-hook (lambda () (tern-mode t)))
+;; (eval-after-load 'tern
+;;   '(progn
+;;      (require 'tern-auto-complete)
+;;      (tern-ac-setup)))
 
 ;; js turn function into f
 (add-hook 'js2-mode-hook
@@ -340,5 +350,5 @@
 (add-hook 'js2-mode-hook (lambda () (whitespace-mode t)))
 (add-hook 'coffee-mode-hook (lambda () (whitespace-mode t)))
 (setq whitespace-style '(face lines-tail trailing))
-(setq whitespace-line-column 84)
+(setq whitespace-line-column 160)
 (setq whitespace-action '(auto-cleanup))
