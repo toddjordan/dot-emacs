@@ -1,6 +1,7 @@
 (require 'package)
 (setq package-archives '(("marmalade" . "https://marmalade-repo.org/packages/")
-             ("melpa" . "http://melpa.org/packages/")))
+                         ("melpa" . "http://melpa.org/packages/")
+                         ("gnu" . "https://elpa.gnu.org/packages/")))
 (package-initialize)
 
 (when (not package-archive-contents)
@@ -23,6 +24,7 @@
                       js-comint
                       js2-mode
                       js2-refactor
+                      magit
                       web-beautify
                       less-css-mode
                       scss-mode
@@ -43,12 +45,12 @@
                       emmet-mode
                       markdown-mode
                       zenburn-theme
+                      editorconfig
                       ))
 
 (dolist (p my-packages)
   (when (not (package-installed-p p))
     (package-install p)))
-
 
 ;; ido mode customization
 ;; disables find file from looking outside current dir
@@ -75,7 +77,7 @@
 
 (set-frame-size-according-to-resolution)
 
-
+(column-number-mode)
 (menu-bar-mode)
 (tool-bar-mode)
 (when (display-graphic-p) (scroll-bar-mode))
@@ -91,7 +93,6 @@
 (require 'yasnippet)
 (yas-reload-all)
 
-
 ;; (setq magit-last-seen-setup-instructions "1.4.0")
 ;; (setq magit-highlight-whitespace nil)
 (global-set-key (kbd "C-c g") 'magit-status)
@@ -104,10 +105,15 @@
  ;; If there is more than one, they won't work right.
  '(custom-safe-themes
    (quote
-    ("2e5705ad7ee6cfd6ab5ce81e711c526ac22abed90b852ffaf0b316aa7864b11f" default)))
+    ("c4465c56ee0cac519dd6ab6249c7fd5bb2c7f7f78ba2875d28a50d3c20a59473" "f5eb916f6bd4e743206913e6f28051249de8ccfd070eae47b5bde31ee813d55f" "2e5705ad7ee6cfd6ab5ce81e711c526ac22abed90b852ffaf0b316aa7864b11f" default)))
  '(inhibit-startup-screen t)
  '(magit-commit-arguments nil)
- '(org-startup-truncated nil))
+ '(org-startup-truncated nil)
+ '(safe-local-variable-values
+   (quote
+    ((web-mode-css-indent-offset . 4)
+     (web-mode-code-indent-offset . 4)
+     (web-mode-markup-indent-offset . 4)))))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
@@ -159,11 +165,12 @@
 ;; (add-hook 'js2-mode-hook 'ac-js2-mode)
 
 (setq js2-highlight-level 3)
-;; (setq js-indent-level 2)
-(setq js2-basic-offset 4)
+(setq js2-basic-offset 2)
 (setq js2-bounce-indent-p t)
 (setq js2-missing-semi-one-line-override t)
 (setq js2-strict-missing-semi-warning nil)
+
+;; (add-hook json-mode-hook (lambda () make-local-variable 'js-indent-level) (setq js-indent-level 2))
 
 
 ;; ;; tern auto complete
@@ -199,6 +206,16 @@
 (setq coffee-tab-width 4)
 (add-hook 'coffee-mode-hook
           (lambda () (flycheck-mode t)))
+
+(add-hook 'coffee-mode-hook
+          (lambda ()
+            (if (string-prefix-p "/Users/jordanto/dev/realtime-service"
+                                 (buffer-file-name))
+                (progn
+                  (setq-local coffee-indent-tabs-mode t)
+                  (setq-local indent-tabs-mode t)
+                  (setq-local flymake-coffee-coffeelint-configuration-file
+                              "/Users/jordanto/dev/realtime-service/coffeelint.json")))))
 
 
 ;;; auto complete mod
@@ -249,7 +266,6 @@
   (setq web-mode-ac-sources-alist
         '(("css" . (ac-source-css-property))
           ("html" . (ac-source-words-in-buffer ac-source-abbrev))))
-
 )
 (add-hook 'web-mode-hook 'my-web-mode-hook)
 
@@ -268,10 +284,15 @@
 (add-to-list 'auto-mode-alist '("\\.text\\'" . markdown-mode))
 (add-to-list 'auto-mode-alist '("\\.markdown\\'" . markdown-mode))
 (add-to-list 'auto-mode-alist '("\\.md\\'" . markdown-mode))
+;; (add-hook 'markdown-mode-hook 'turn-on-auto-fill)
 
 ;; CIDER
 
 (require 'cider-mode)
+
+;; (add-to-list 'exec-path "/usr/local/bin")
+(setenv "PATH" (concat (getenv "PATH") ":/usr/local/bin"))
+(setq exec-path (append exec-path '("/usr/local/bin")))
 
 ;;(global-company-mode)
 ;;(add-hook 'after-init-hook 'global-company-mode)
@@ -288,10 +309,13 @@
 ;; switch current buffer into repl
 (setq cider-repl-display-in-current-window t)
 
-(add-hook 'cider-mode-hook 'cider-turn-on-eldoc-mode)
 (add-hook 'clojure-mode-hook 'rainbow-delimiters-mode)
 (add-hook 'clojure-mode-hook 'paredit-mode)
+(add-hook 'clojure-mode-hook 'cider-mode)
 (add-hook 'cider-mode-hook #'eldoc-mode)
+(add-hook 'cider-mode-hook #'company-mode)
+(add-hook 'cider-mode-hook 'cider-turn-on-eldoc-mode)
+(add-hook 'cider-repl-mode-hook #'company-mode)
 
 (show-paren-mode 1)
 
@@ -328,7 +352,7 @@
   (button 'defun)
   (textarea 'defun))
 
-(setq-default fill-column 80)
+(setq-default fill-column 200)
 
 ;; SCSS
 (require 'scss-mode)
@@ -352,3 +376,4 @@
 (setq whitespace-style '(face lines-tail trailing))
 (setq whitespace-line-column 160)
 (setq whitespace-action '(auto-cleanup))
+(put 'erase-buffer 'disabled nil)
