@@ -46,6 +46,7 @@
                       markdown-mode
                       zenburn-theme
                       editorconfig
+                      find-file-in-project
                       ))
 
 (dolist (p my-packages)
@@ -103,6 +104,8 @@
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
+ '(cider-auto-select-test-report-buffer t)
+ '(cider-test-show-report-on-success t)
  '(custom-safe-themes
    (quote
     ("c4465c56ee0cac519dd6ab6249c7fd5bb2c7f7f78ba2875d28a50d3c20a59473" "f5eb916f6bd4e743206913e6f28051249de8ccfd070eae47b5bde31ee813d55f" "2e5705ad7ee6cfd6ab5ce81e711c526ac22abed90b852ffaf0b316aa7864b11f" default)))
@@ -125,6 +128,15 @@
 (add-to-list 'custom-theme-load-path "~/.emacs.d/themes/")
 (load-theme 'zenburn)
 
+;;;ido
+(ido-mode 1)
+(ido-everywhere 1)
+
+;;; Find File in Project
+(autoload 'find-file-in-project "find-file-in-project" nil t)
+(autoload 'find-file-in-project-by-selected "find-file-in-project-by-selected" nil t)
+(autoload 'find-directory-in-project-by-selected "find-directory-in-project-by-selected" nil t)
+
 ;;; Org Mode
 (add-hook 'org-mode-hook 'yas-minor-mode)
 
@@ -132,6 +144,7 @@
 (add-to-list 'load-path "/Users/jordanto/dev/emacs/emacs-neotree")
 (require 'neotree)
 (global-set-key [f8] 'neotree-toggle)
+(setq neo-smart-open t)
 
 ;; (defun neotree-project-dir ()
 ;;   "Open NeoTree using the git root."
@@ -285,7 +298,7 @@
 (add-to-list 'auto-mode-alist '("\\.markdown\\'" . markdown-mode))
 (add-to-list 'auto-mode-alist '("\\.md\\'" . markdown-mode))
 ;; (add-hook 'markdown-mode-hook 'turn-on-auto-fill)
-
+(add-hook 'markdown-mode-hook 'flyspell-mode)
 ;; CIDER
 
 (require 'cider-mode)
@@ -298,30 +311,30 @@
 ;;(add-hook 'after-init-hook 'global-company-mode)
 
 (setq nrepl-log-messages t)
-(setq nrepl-hide-special-buffers t)
+;; (setq nrepl-hide-special-buffers t)
 
-;;(setq cider-repl-pop-to-buffer-on-connect nil)
-(setq cider-show-error-buffer 'except-in-repl)
-(setq cider-stacktrace-default-filters '(java repl tooling dup))
-;;(setq cider-repl-display-in-current-window t)
+;; (setq cider-repl-pop-to-buffer-on-connect nil)
+;; (setq cider-show-error-buffer 'except-in-repl)
+;; (setq cider-stacktrace-default-filters '(java repl tooling dup))
+;; (setq cider-repl-display-in-current-window t)
 (setq cider-switch-to-repl-command #'cider-switch-to-current-repl-buffer)
+(setq cider-test-show-report t)
+(cider-auto-test-mode 1)
 
 ;; switch current buffer into repl
 (setq cider-repl-display-in-current-window t)
 
 (add-hook 'clojure-mode-hook 'rainbow-delimiters-mode)
 (add-hook 'clojure-mode-hook 'paredit-mode)
-(add-hook 'clojure-mode-hook 'cider-mode)
-(add-hook 'cider-mode-hook #'eldoc-mode)
+;; (add-hook 'clojure-mode-hook 'cider-mode)
 (add-hook 'cider-mode-hook #'company-mode)
-(add-hook 'cider-mode-hook 'cider-turn-on-eldoc-mode)
 (add-hook 'cider-repl-mode-hook #'company-mode)
 
 (show-paren-mode 1)
 
 ;; popup contextual docs
-(eval-after-load "cider"
-  '(define-key cider-mode-map (kbd "C-c C-d") 'ac-nrepl-popup-doc))
+;; (eval-after-load "cider"
+;;   '(define-key cider-mode-map (kbd "C-c C-d") 'ac-nrepl-popup-doc))
 
 ;; Clojure Coding Standards
 (add-to-list 'auto-mode-alist '("\\.boot\\'" . clojure-mode))
