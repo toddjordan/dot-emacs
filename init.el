@@ -111,6 +111,7 @@
     ("c4465c56ee0cac519dd6ab6249c7fd5bb2c7f7f78ba2875d28a50d3c20a59473" "f5eb916f6bd4e743206913e6f28051249de8ccfd070eae47b5bde31ee813d55f" "2e5705ad7ee6cfd6ab5ce81e711c526ac22abed90b852ffaf0b316aa7864b11f" default)))
  '(inhibit-startup-screen t)
  '(magit-commit-arguments nil)
+ '(org-agenda-files (quote ("~/dev/notebook/education-todos.org")))
  '(org-startup-truncated nil)
  '(safe-local-variable-values
    (quote
@@ -183,7 +184,9 @@
 (setq js2-missing-semi-one-line-override t)
 (setq js2-strict-missing-semi-warning nil)
 
-;; (add-hook json-mode-hook (lambda () make-local-variable 'js-indent-level) (setq js-indent-level 2))
+(add-hook 'json-mode-hook (lambda ()
+                           (make-local-variable 'js-indent-level)
+                           (setq js-indent-level 2)))
 
 
 ;; ;; tern auto complete
@@ -215,21 +218,15 @@
 (add-hook 'js2-mode-hook
           (lambda () (flycheck-mode t)))
 
+(add-to-list 'load-path "~/.emacs.d/ember-mode/")
+(require 'ember-mode)
+(add-hook 'js-mode-hook (lambda () (ember-mode t)))
+(add-hook 'web-mode-hook (lambda () (ember-mode t)))
+
 ;;; coffeescript
 (setq coffee-tab-width 4)
 (add-hook 'coffee-mode-hook
           (lambda () (flycheck-mode t)))
-
-(add-hook 'coffee-mode-hook
-          (lambda ()
-            (if (string-prefix-p "/Users/jordanto/dev/realtime-service"
-                                 (buffer-file-name))
-                (progn
-                  (setq-local coffee-indent-tabs-mode t)
-                  (setq-local indent-tabs-mode t)
-                  (setq-local flymake-coffee-coffeelint-configuration-file
-                              "/Users/jordanto/dev/realtime-service/coffeelint.json")))))
-
 
 ;;; auto complete mod
 (require 'auto-complete-config)
