@@ -32,8 +32,6 @@
                       web-mode
                       web-beautify
                       coffee-mode
-                      less-css-mode
-                      scss-mode
                       feature-mode
                       cider
                       cider-decompile
@@ -47,6 +45,9 @@
                       zenburn-theme
                       editorconfig
                       find-file-in-project
+                      projectile
+                      nyan-mode
+                      flx-ido
                       ))
 
 (dolist (p my-packages)
@@ -81,6 +82,7 @@
 (column-number-mode)
 (menu-bar-mode)
 (tool-bar-mode)
+(global-hl-line-mode)
 (when (display-graphic-p) (scroll-bar-mode))
 (when (not (display-graphic-p))(remove-hook 'prog-mode-hook 'esk-turn-on-hl-line-mode))
 (when (display-graphic-p) (x-focus-frame nil))
@@ -104,20 +106,48 @@
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
+ '(ansi-color-names-vector
+   ["#3F3F3F" "#CC9393" "#7F9F7F" "#F0DFAF" "#8CD0D3" "#DC8CC3" "#93E0E3" "#DCDCCC"])
  '(cider-auto-select-test-report-buffer t)
  '(cider-test-show-report-on-success t)
  '(custom-safe-themes
    (quote
-    ("c4465c56ee0cac519dd6ab6249c7fd5bb2c7f7f78ba2875d28a50d3c20a59473" "f5eb916f6bd4e743206913e6f28051249de8ccfd070eae47b5bde31ee813d55f" "2e5705ad7ee6cfd6ab5ce81e711c526ac22abed90b852ffaf0b316aa7864b11f" default)))
+    ("0e219d63550634bc5b0c214aced55eb9528640377daf486e13fb18a32bf39856" "c4465c56ee0cac519dd6ab6249c7fd5bb2c7f7f78ba2875d28a50d3c20a59473" "f5eb916f6bd4e743206913e6f28051249de8ccfd070eae47b5bde31ee813d55f" "2e5705ad7ee6cfd6ab5ce81e711c526ac22abed90b852ffaf0b316aa7864b11f" default)))
+ '(fci-rule-color "#383838")
  '(inhibit-startup-screen t)
  '(magit-commit-arguments nil)
+ '(nrepl-message-colors
+   (quote
+    ("#CC9393" "#DFAF8F" "#F0DFAF" "#7F9F7F" "#BFEBBF" "#93E0E3" "#94BFF3" "#DC8CC3")))
  '(org-agenda-files (quote ("~/dev/notebook/education-todos.org")))
  '(org-startup-truncated nil)
  '(safe-local-variable-values
    (quote
     ((web-mode-css-indent-offset . 4)
      (web-mode-code-indent-offset . 4)
-     (web-mode-markup-indent-offset . 4)))))
+     (web-mode-markup-indent-offset . 4))))
+ '(vc-annotate-background "#2B2B2B")
+ '(vc-annotate-color-map
+   (quote
+    ((20 . "#BC8383")
+     (40 . "#CC9393")
+     (60 . "#DFAF8F")
+     (80 . "#D0BF8F")
+     (100 . "#E0CF9F")
+     (120 . "#F0DFAF")
+     (140 . "#5F7F5F")
+     (160 . "#7F9F7F")
+     (180 . "#8FB28F")
+     (200 . "#9FC59F")
+     (220 . "#AFD8AF")
+     (240 . "#BFEBBF")
+     (260 . "#93E0E3")
+     (280 . "#6CA0A3")
+     (300 . "#7CB8BB")
+     (320 . "#8CD0D3")
+     (340 . "#94BFF3")
+     (360 . "#DC8CC3"))))
+ '(vc-annotate-very-old-color "#DC8CC3"))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
@@ -163,6 +193,24 @@
 (global-set-key (kbd "M-x") 'smex)
 (global-set-key (kbd "M-X") 'smex-major-mode-commands)
 
+;;; nyan-mode
+(require 'nyan-mode)
+(nyan-mode)
+(nyan-start-animation)
+(setq nyan-wavy-trail t)
+
+;;; flx ido
+(require 'flx-ido)
+(ido-mode 1)
+(ido-everywhere 1)
+(flx-ido-mode 1)
+;; disable ido faces to see flx highlights.
+(setq ido-enable-flex-matching t)
+(setq ido-use-faces nil)
+
+;;; projectile
+(require 'projectile)
+(projectile-mode)
 
 ;;; feature-mode
 (setq feature-default-languate "fi")
