@@ -130,7 +130,6 @@
  '(nrepl-message-colors
    (quote
     ("#CC9393" "#DFAF8F" "#F0DFAF" "#7F9F7F" "#BFEBBF" "#93E0E3" "#94BFF3" "#DC8CC3")))
- '(org-agenda-files (quote ("~/dev/notebook/education-todos.org")))
  '(org-startup-truncated nil)
  '(safe-local-variable-values
    (quote
@@ -181,6 +180,15 @@
 
 ;;; Org Mode
 (add-hook 'org-mode-hook 'yas-minor-mode)
+(setq org-agenda-files (list "~/dev/notebook/"
+                                 "~/dev/notebook/teams"
+                                 "~/dev/notebook/presentations"
+                                 "~/dev/notebook/projects"))
+(setq org-tag-alist '(("projects" . ?p)
+                      ("notes" . ?n)
+                      ("purecloud" . ?c)
+                      ("oss" . ?o)
+                      ("teams" . ?t)))
 
 ;;; NeoTree
 (add-to-list 'load-path "/Users/jordanto/dev/emacs/emacs-neotree")
