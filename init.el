@@ -45,6 +45,7 @@
                       zenburn-theme
                       editorconfig
                       find-file-in-project
+                      ember-mode
                       projectile
                       nyan-mode
                       flx-ido
@@ -79,6 +80,7 @@
 
 (set-frame-size-according-to-resolution)
 
+;; General Config
 (column-number-mode)
 (menu-bar-mode)
 (tool-bar-mode)
@@ -93,9 +95,18 @@
 (setq tab-width 4)
 (setq ispell-program-name "/usr/local/bin/aspell")
 
+;; save backups to system temp, and disable lock files
+;; this is so ember-cli/watchman does not get messed up
+(setq backup-directory-alist
+      `((".*" . ,temporary-file-directory)))
+(setq auto-save-file-name-transforms
+      `((".*" ,temporary-file-directory t)))
+(setq create-lockfiles nil)
+
 (require 'yasnippet)
 (yas-reload-all)
 
+;; Magit config
 ;; (setq magit-last-seen-setup-instructions "1.4.0")
 ;; (setq magit-highlight-whitespace nil)
 (global-set-key (kbd "C-c g") 'magit-status)
@@ -266,6 +277,7 @@
 (add-hook 'js2-mode-hook
           (lambda () (flycheck-mode t)))
 
+;;; ember-mode
 (add-to-list 'load-path "~/.emacs.d/ember-mode/")
 (require 'ember-mode)
 (add-hook 'js-mode-hook (lambda () (ember-mode t)))
@@ -280,7 +292,6 @@
 (require 'auto-complete-config)
 (add-to-list 'ac-dictionary-directories "~/.emacs.d/elpa/auto-complete-1.4/dict")
 (ac-config-default)
-
 
 ;;; js refactor
 (require 'js2-refactor)
