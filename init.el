@@ -187,6 +187,7 @@
 (setq org-tag-alist '(("projects" . ?p)
                       ("notes" . ?n)
                       ("purecloud" . ?c)
+                      ("presentations" . ?r)
                       ("oss" . ?o)
                       ("teams" . ?t)))
 
