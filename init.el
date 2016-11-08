@@ -24,6 +24,7 @@
                       js-comint
                       js2-mode
                       js2-refactor
+                      json-mode
                       magit
                       web-beautify
                       less-css-mode
@@ -85,6 +86,7 @@
 (menu-bar-mode)
 (tool-bar-mode)
 (global-hl-line-mode)
+(desktop-save-mode 1)
 (when (display-graphic-p) (scroll-bar-mode))
 (when (not (display-graphic-p))(remove-hook 'prog-mode-hook 'esk-turn-on-hl-line-mode))
 (when (display-graphic-p) (x-focus-frame nil))
@@ -181,15 +183,19 @@
 ;;; Org Mode
 (add-hook 'org-mode-hook 'yas-minor-mode)
 (setq org-agenda-files (list "~/dev/notebook/"
-                                 "~/dev/notebook/teams"
-                                 "~/dev/notebook/presentations"
-                                 "~/dev/notebook/projects"))
+                             "~/dev/notebook/teams"
+                             "~/dev/notebook/presentations"
+                             "~/dev/notebook/projects"
+                             "~/dev/notebook/notes"
+                             "~/dev/notebook/writing"
+                             "~/dev/notebook/events"))
 (setq org-tag-alist '(("projects" . ?p)
                       ("notes" . ?n)
                       ("purecloud" . ?c)
                       ("presentations" . ?r)
                       ("oss" . ?o)
-                      ("teams" . ?t)))
+                      ("teams" . ?t)
+                      ("ember" . ?e)))
 
 ;;; NeoTree
 (add-to-list 'load-path "/Users/jordanto/dev/emacs/emacs-neotree")
@@ -285,6 +291,31 @@
 (require 'flycheck)
 (add-hook 'js2-mode-hook
           (lambda () (flycheck-mode t)))
+;; disable jshint since we prefer eslint checking
+(setq-default flycheck-disabled-checkers
+  (append flycheck-disabled-checkers
+    '(javascript-jshint)))
+
+;; use eslint with web-mode for jsx files
+(flycheck-add-mode 'javascript-eslint 'web-mode)
+
+;; customize flycheck temp file prefix
+(setq-default flycheck-temp-prefix ".flycheck")
+
+;; disable json-jsonlist checking for json files
+(setq-default flycheck-disabled-checkers
+  (append flycheck-disabled-checkers
+    '(json-jsonlist)))
+
+;; https://github.com/purcell/exec-path-from-shell
+;; only need exec-path-from-shell on OSX
+;; this hopefully sets up path and other vars better
+(when (memq window-system '(mac ns))
+  (exec-path-from-shell-initialize))
+
+;; eslint --fix on save
+(eval-after-load 'js2-mode
+       '(add-hook 'js2-mode-hook (lambda () (add-hook 'after-save-hook 'eslint-fix nil t))))
 
 ;;; ember-mode
 (add-to-list 'load-path "~/.emacs.d/ember-mode/")
