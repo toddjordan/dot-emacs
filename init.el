@@ -105,6 +105,12 @@
       `((".*" ,temporary-file-directory t)))
 (setq create-lockfiles nil)
 
+(add-hook 'ibuffer-hook
+          '(lambda ()
+             (ibuffer-vc-set-filter-groups-by-vc-root)
+             (ibuffer-auto-mode 1)))
+(setq ibuffer-default-sorting-mode 'major-mode)
+
 (require 'yasnippet)
 (yas-reload-all)
 
@@ -179,6 +185,23 @@
 (autoload 'find-file-in-project "find-file-in-project" nil t)
 (autoload 'find-file-in-project-by-selected "find-file-in-project-by-selected" nil t)
 (autoload 'find-directory-in-project-by-selected "find-directory-in-project-by-selected" nil t)
+
+;;; Ergonomics
+;; While typing, I want to upcase/downcase/capitalize words I just typed (especially since I've mapped caps lock to Ctl ;-)
+;; M-u
+(defadvice upcase-word (before upcase-word-advice activate)
+  (unless (and (looking-back "\\b") (not (= (point) (line-end-position))))
+    (backward-word)))
+
+;; M-l
+(defadvice downcase-word (before downcase-word-advice activate)
+  (unless (and (looking-back "\\b") (not (= (point) (line-end-position))))
+    (backward-word)))
+
+;; M-c
+(defadvice capitalize-word (before capitalize-word-advice activate)
+  (unless (and (looking-back "\\b") (not (= (point) (line-end-position))))
+    (backward-word)))
 
 ;;; Org Mode
 (add-hook 'org-mode-hook 'yas-minor-mode)
@@ -467,12 +490,14 @@
 (require 'scss-mode)
 (setq scss-sass-command "node-sass")
 (setq-default scss-compile-at-save nil)
+(setq css-indent-offset 2)
 
 ;; Emmet
 (require 'emmet-mode)
 (add-hook 'css-mode-hook  'emmet-mode)
 (add-hook 'html-mode-hook  'emmet-mode)
 (add-hook 'web-mode-hook 'emmet-mode)
+(add-hook 'scss-mode-hook 'emmet-mode)
 (add-hook 'emmet-mode-hook (lambda () (setq emmet-indentation 2)))
 (setq emmet-move-cursor-between-quotes t)
 
@@ -482,6 +507,7 @@
 (add-hook 'clojurescript-mode-hook (lambda () (whitespace-mode t)))
 (add-hook 'js2-mode-hook (lambda () (whitespace-mode t)))
 (add-hook 'coffee-mode-hook (lambda () (whitespace-mode t)))
+(add-hook 'scss-mode-hook (lambda () (whitespace-mode t)))
 (setq whitespace-style '(face lines-tail trailing))
 (setq whitespace-line-column 160)
 (setq whitespace-action '(auto-cleanup))
