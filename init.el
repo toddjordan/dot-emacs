@@ -18,6 +18,7 @@
                       clojure-mode
                       rainbow-delimiters
                       yasnippet
+                      ac-cider
                       ac-nrepl
                       ac-emmet
                       ac-js2
@@ -189,19 +190,22 @@
 ;;; Ergonomics
 ;; While typing, I want to upcase/downcase/capitalize words I just typed (especially since I've mapped caps lock to Ctl ;-)
 ;; M-u
-(defadvice upcase-word (before upcase-word-advice activate)
+(defun upcase-word--upcase-word-advice (count)
   (unless (and (looking-back "\\b") (not (= (point) (line-end-position))))
     (backward-word)))
+(advice-add 'upcase-word :before #'upcase-word--upcase-word-advice)
 
 ;; M-l
-(defadvice downcase-word (before downcase-word-advice activate)
+(defun downcase-word--downcase-word-advice (count)
   (unless (and (looking-back "\\b") (not (= (point) (line-end-position))))
     (backward-word)))
+(advice-add 'downcase-word :before #'downcase-word--downcase-word-advice)
 
 ;; M-c
-(defadvice capitalize-word (before capitalize-word-advice activate)
-  (unless (and (looking-back "\\b") (not (= (point) (line-end-position))))
-    (backward-word)))
+(defun capitalize-word--capitalize-word-advice (count)
+    (unless (and (looking-back "\\b") (not (= (point) (line-end-position))))
+      (backward-word)))
+(advice-add 'capitalize-word :before #'capitalize-word--capitalize-word-advice)
 
 ;;; Org Mode
 (add-hook 'org-mode-hook 'yas-minor-mode)
@@ -286,17 +290,19 @@
                            (setq js-indent-level 2)))
 
 
-;; ;; tern auto complete
-;; (add-hook 'js2-mode-hook (lambda () (tern-mode t)))
-;; (eval-after-load 'tern
-;;   '(progn
-;;      (require 'tern-auto-complete)
-;;      (tern-ac-setup)))
-
 ;; js turn function into f
 (add-hook 'js2-mode-hook
           (lambda ()
             (push '("function" . ?ƒ) prettify-symbols-alist)))
+;;; tern
+(add-to-list 'load-path "/usr/local/lib/node_modules/tern/emacs")
+(autoload 'tern-mode "tern.el" nil t)
+(add-hook 'js2-mode-hook (lambda () (tern-mode t)))
+
+(eval-after-load 'tern
+  '(progn
+     (require 'tern-auto-complete)
+     (tern-ac-setup)))
 
 ;;; paredit
 (defun my-paredit-nonlisp ()
@@ -358,6 +364,8 @@
 
 ;;; js refactor
 (require 'js2-refactor)
+(add-hook 'js2-mode-hook #'js2-refactor-mode)
+(js2r-add-keybindings-with-prefix "C-c C-m")
 
 ;;; paredit mode
 (autoload 'enable-paredit-mode "paredit" "Turn on pseudo-structural editing of Lisp code." t)
@@ -418,8 +426,8 @@
 (add-to-list 'auto-mode-alist '("\\.md\\'" . markdown-mode))
 ;; (add-hook 'markdown-mode-hook 'turn-on-auto-fill)
 (add-hook 'markdown-mode-hook 'flyspell-mode)
-;; CIDER
 
+;;; CIDER
 (require 'cider-mode)
 
 ;; (add-to-list 'exec-path "/usr/local/bin")
@@ -435,7 +443,6 @@
 ;; (setq cider-repl-pop-to-buffer-on-connect nil)
 ;; (setq cider-show-error-buffer 'except-in-repl)
 ;; (setq cider-stacktrace-default-filters '(java repl tooling dup))
-;; (setq cider-repl-display-in-current-window t)
 (setq cider-switch-to-repl-command #'cider-switch-to-current-repl-buffer)
 (setq cider-test-show-report t)
 (cider-auto-test-mode 1)
@@ -445,15 +452,26 @@
 
 (add-hook 'clojure-mode-hook 'rainbow-delimiters-mode)
 (add-hook 'clojure-mode-hook 'paredit-mode)
-;; (add-hook 'clojure-mode-hook 'cider-mode)
-(add-hook 'cider-mode-hook #'company-mode)
-(add-hook 'cider-repl-mode-hook #'company-mode)
+(add-hook 'cider-repl-mode-hook 'rainbow-delimiters-mode)
+(add-hook 'cider-repl-mode-hook 'paredit-mode)
+
+;; (add-hook 'cider-mode-hook #'company-mode)
+;; (add-hook 'cider-repl-mode-hook #'company-mode)
 
 (show-paren-mode 1)
 
 ;; popup contextual docs
 ;; (eval-after-load "cider"
 ;;   '(define-key cider-mode-map (kbd "C-c C-d") 'ac-nrepl-popup-doc))
+
+(require 'ac-cider)
+(add-hook 'cider-mode-hook 'ac-flyspell-workaround)
+(add-hook 'cider-mode-hook 'ac-cider-setup)
+(add-hook 'cider-repl-mode-hook 'ac-cider-setup)
+(eval-after-load "auto-complete"
+  '(progn
+     (add-to-list 'ac-modes 'cider-mode)
+     (add-to-list 'ac-modes 'cider-repl-mode)))
 
 ;; Clojure Coding Standards
 (add-to-list 'auto-mode-alist '("\\.boot\\'" . clojure-mode))
