@@ -51,6 +51,7 @@
                       projectile
                       nyan-mode
                       flx-ido
+                      toggle-quotes
                       ))
 
 (dolist (p my-packages)
@@ -97,6 +98,11 @@
 (global-set-key (kbd "C-x O") 'previous-multiframe-window)
 (setq tab-width 4)
 (setq ispell-program-name "/usr/local/bin/aspell")
+
+;; increase/decrease font size
+(global-set-key (kbd "C-+") 'text-scale-increase)
+(global-set-key (kbd "C-=") 'text-scale-increase)
+(global-set-key (kbd "C--") 'text-scale-decrease)
 
 ;; save backups to system temp, and disable lock files
 ;; this is so ember-cli/watchman does not get messed up
@@ -530,3 +536,7 @@
 (setq whitespace-line-column 160)
 (setq whitespace-action '(auto-cleanup))
 (put 'erase-buffer 'disabled nil)
+
+;; toggle-quotes
+(require 'toggle-quotes)
+(global-set-key (kbd "C-'") 'toggle-quotes)
