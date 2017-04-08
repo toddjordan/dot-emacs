@@ -52,6 +52,8 @@
                       nyan-mode
                       flx-ido
                       toggle-quotes
+                      ox-gfm
+                      tide
                       ))
 
 (dolist (p my-packages)
@@ -98,11 +100,13 @@
 (global-set-key (kbd "C-x O") 'previous-multiframe-window)
 (setq tab-width 4)
 (setq ispell-program-name "/usr/local/bin/aspell")
+(global-set-key (kbd "C-c j") 'just-one-space)
 
 ;; increase/decrease font size
 (global-set-key (kbd "C-+") 'text-scale-increase)
 (global-set-key (kbd "C-=") 'text-scale-increase)
 (global-set-key (kbd "C--") 'text-scale-decrease)
+(set-face-attribute 'default nil :font "Menlo 16")
 
 ;; save backups to system temp, and disable lock files
 ;; this is so ember-cli/watchman does not get messed up
@@ -136,6 +140,7 @@
    ["#3F3F3F" "#CC9393" "#7F9F7F" "#F0DFAF" "#8CD0D3" "#DC8CC3" "#93E0E3" "#DCDCCC"])
  '(cider-auto-select-test-report-buffer t)
  '(cider-test-show-report-on-success t)
+ '(column-number-mode t)
  '(custom-safe-themes
    (quote
     ("0e219d63550634bc5b0c214aced55eb9528640377daf486e13fb18a32bf39856" "c4465c56ee0cac519dd6ab6249c7fd5bb2c7f7f78ba2875d28a50d3c20a59473" "f5eb916f6bd4e743206913e6f28051249de8ccfd070eae47b5bde31ee813d55f" "2e5705ad7ee6cfd6ab5ce81e711c526ac22abed90b852ffaf0b316aa7864b11f" default)))
@@ -151,6 +156,7 @@
     ((web-mode-css-indent-offset . 4)
      (web-mode-code-indent-offset . 4)
      (web-mode-markup-indent-offset . 4))))
+ '(show-paren-mode t)
  '(vc-annotate-background "#2B2B2B")
  '(vc-annotate-color-map
    (quote
@@ -230,6 +236,10 @@
                       ("teams" . ?t)
                       ("ember" . ?e)))
 
+;; load github markdown export
+(eval-after-load "org"
+  '(require 'ox-gfm nil t))
+
 ;;; NeoTree
 (add-to-list 'load-path "/Users/jordanto/dev/emacs/emacs-neotree")
 (require 'neotree)
@@ -253,10 +263,10 @@
 (global-set-key (kbd "M-X") 'smex-major-mode-commands)
 
 ;;; nyan-mode
-(require 'nyan-mode)
-(nyan-mode)
-(nyan-start-animation)
-(setq nyan-wavy-trail t)
+;; (require 'nyan-mode)
+;; (nyan-mode)
+;; (nyan-start-animation)
+;; (setq nyan-wavy-trail t)
 
 ;;; flx ido
 (require 'flx-ido)
@@ -350,7 +360,7 @@
 
 ;; eslint --fix on save
 (eval-after-load 'js2-mode
-       '(add-hook 'js2-mode-hook (lambda () (add-hook 'after-save-hook 'eslint-fix nil t))))
+  '(add-hook 'js2-mode-hook (lambda () (add-hook 'after-save-hook 'eslint-fix nil t))))
 
 ;;; ember-mode
 (add-to-list 'load-path "~/.emacs.d/ember-mode/")
@@ -381,6 +391,60 @@
 (add-hook 'lisp-mode-hook             #'enable-paredit-mode)
 (add-hook 'lisp-interaction-mode-hook #'enable-paredit-mode)
 (add-hook 'scheme-mode-hook           #'enable-paredit-mode)
+
+
+;; Typescript (Tide)
+
+(defun setup-tide-mode ()
+  (interactive)
+  (tide-setup)
+  (flycheck-mode +1)
+  (setq flycheck-check-syntax-automatically '(save mode-enabled))
+  (eldoc-mode +1)
+  (tide-hl-identifier-mode +1)
+  (company-mode +1))
+
+;; aligns annotation to the right hand side
+(setq company-tooltip-align-annotations t)
+
+;; formats the buffer before saving
+(add-hook 'before-save-hook 'tide-format-before-save)
+
+(add-hook 'typescript-mode-hook #'setup-tide-mode)
+
+(add-to-list 'auto-mode-alist '("\\.ts$" . typescript-mode))
+
+;;; web beautify
+(require 'web-beautify)
+(eval-after-load 'js2-mode
+  '(define-key js2-mode-map (kbd "C-c b") 'web-beautify-js))
+
+(eval-after-load 'json-mode
+  '(define-key json-mode-map (kbd "C-c b") 'web-beautify-js))
+
+(eval-after-load 'sgml-mode
+  '(define-key html-mode-map (kbd "C-c b") 'web-beautify-html))
+
+(eval-after-load 'web-mode
+  '(define-key web-mode-map (kbd "C-c b") 'web-beautify-html))
+
+(eval-after-load 'css-mode
+  '(define-key css-mode-map (kbd "C-c b") 'web-beautify-css))
+
+;; (eval-after-load 'js2-mode
+;;   '(add-hook 'js2-mode-hook (lambda () (add-hook 'before-save-hook 'web-beautify-js-buffer t t))))
+
+;; (eval-after-load 'json-mode
+;;   '(add-hook 'json-mode-hook (lambda () (add-hook 'before-save-hook 'web-beautify-js-buffer t t))))
+
+(eval-after-load 'sgml-mode
+  '(add-hook 'html-mode-hook (lambda () (add-hook 'before-save-hook 'web-beautify-html-buffer t t))))
+
+(eval-after-load 'css-mode
+  '(add-hook 'css-mode-hook (lambda () (add-hook 'before-save-hook 'web-beautify-css-buffer t t))))
+
+;; (eval-after-load 'web-mode
+;;   '(add-hook 'web-mode-hook (lambda () (add-hook 'before-save-hook 'web-beautify-html-buffer t t))))
 
 ;;; web mode
 (require 'web-mode)
@@ -432,6 +496,10 @@
 (add-to-list 'auto-mode-alist '("\\.md\\'" . markdown-mode))
 ;; (add-hook 'markdown-mode-hook 'turn-on-auto-fill)
 (add-hook 'markdown-mode-hook 'flyspell-mode)
+
+(autoload 'gfm-mode "gfm-mode"
+   "Major mode for editing GitHub Flavored Markdown files" t)
+(add-to-list 'auto-mode-alist '("README\\.md\\'" . gfm-mode))
 
 ;;; CIDER
 (require 'cider-mode)
@@ -516,6 +584,37 @@
 (setq-default scss-compile-at-save nil)
 (setq css-indent-offset 2)
 
+;; Show hex color
+(defun xah-syntax-color-hex ()
+  "Syntax color text of the form 「#ff1100」 and 「#abc」 in current buffer.
+URL `http://ergoemacs.org/emacs/emacs_CSS_colors.html'
+Version 2016-07-04"
+  (interactive)
+  (font-lock-add-keywords
+   nil
+   '(("#[ABCDEFabcdef[:digit:]]\\{3\\}"
+      (0 (put-text-property
+          (match-beginning 0)
+          (match-end 0)
+          'face (list :background
+                      (let* (
+                             (ms (match-string-no-properties 0))
+                             (r (substring ms 1 2))
+                             (g (substring ms 2 3))
+                             (b (substring ms 3 4)))
+                        (concat "#" r r g g b b))))))
+     ("#[ABCDEFabcdef[:digit:]]\\{6\\}"
+      (0 (put-text-property
+          (match-beginning 0)
+          (match-end 0)
+          'face (list :background (match-string-no-properties 0)))))))
+  (font-lock-fontify-buffer))
+
+(add-hook 'css-mode-hook 'xah-syntax-color-hex)
+(add-hook 'scss-mode-hook 'xah-syntax-color-hex)
+(add-hook 'html-mode-hook 'xah-syntax-color-hex)
+(add-hook 'web-mode-hook 'xah-syntax-color-hex)
+
 ;; Emmet
 (require 'emmet-mode)
 (add-hook 'css-mode-hook  'emmet-mode)
@@ -532,6 +631,7 @@
 (add-hook 'js2-mode-hook (lambda () (whitespace-mode t)))
 (add-hook 'coffee-mode-hook (lambda () (whitespace-mode t)))
 (add-hook 'scss-mode-hook (lambda () (whitespace-mode t)))
+(add-hook 'markdown-mode-hook (lambda () (whitespace-mode t)))
 (setq whitespace-style '(face lines-tail trailing))
 (setq whitespace-line-column 160)
 (setq whitespace-action '(auto-cleanup))
