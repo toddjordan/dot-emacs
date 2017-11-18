@@ -55,6 +55,7 @@
                       ox-gfm
                       tide
                       editorconfig
+                      helm-projectile
                       ))
 
 (dolist (p my-packages)
@@ -226,6 +227,26 @@
 ;;; projectile
 (require 'projectile)
 (projectile-mode)
+
+;;; helm
+(global-set-key (kbd "C-x b") 'helm-mini)
+(global-set-key (kbd "C-x C-m") 'helm-M-x)
+(global-set-key (kbd "C-x C-f") 'helm-find-files)
+(global-set-key (kbd "M-y") 'helm-show-kill-ring)
+
+;; Change the keybinds to whatever you like :)
+(global-set-key (kbd "M-i") 'helm-swoop)
+(global-set-key (kbd "M-I") 'helm-swoop-back-to-last-point)
+(global-set-key (kbd "C-c M-i") 'helm-multi-swoop)
+(global-set-key (kbd "C-x M-i") 'helm-multi-swoop-all)
+
+;; When doing isearch, hand the word over to helm-swoop
+(define-key isearch-mode-map (kbd "M-i") 'helm-swoop-from-isearch)
+
+;;; helm-projectile
+;; (setq helm-projectile-fuzzy-match nil)
+(require 'helm-projectile)
+(helm-projectile-on)
 
 ;;; feature-mode
 (setq feature-default-languate "fi")
