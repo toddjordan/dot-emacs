@@ -56,6 +56,7 @@
                       tide
                       editorconfig
                       helm-projectile
+                      company-tern
                       ))
 
 (dolist (p my-packages)
@@ -278,14 +279,19 @@
           (lambda ()
             (push '("function" . ?ƒ) prettify-symbols-alist)))
 ;;; tern
+(require 'company)
+(require 'company-tern)
 (add-to-list 'load-path "/usr/local/lib/node_modules/tern/emacs")
+(add-to-list 'company-backends 'company-tern)
 (autoload 'tern-mode "tern.el" nil t)
-(add-hook 'js2-mode-hook (lambda () (tern-mode t)))
+(add-hook 'js2-mode-hook (lambda ()
+                           (tern-mode t)
+                           (company-mode t)))
 
-(eval-after-load 'tern
-  '(progn
-     (require 'tern-auto-complete)
-     (tern-ac-setup)))
+;; (eval-after-load 'tern
+;;   '(progn
+;;      (require 'tern-auto-complete)
+;;      (tern-ac-setup)))
 
 ;;; paredit
 (defun my-paredit-nonlisp ()
