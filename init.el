@@ -93,7 +93,8 @@
 (menu-bar-mode)
 (tool-bar-mode)
 (global-hl-line-mode)
-(desktop-save-mode 1)
+;;; desktop save mode: save your open buffers so when you close and ropen
+;;(desktop-save-mode 1)
 (when (display-graphic-p) (scroll-bar-mode))
 (when (not (display-graphic-p))(remove-hook 'prog-mode-hook 'esk-turn-on-hl-line-mode))
 (when (display-graphic-p) (x-focus-frame nil))
