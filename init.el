@@ -57,6 +57,8 @@
                       editorconfig
                       helm-projectile
                       company-tern
+		      neotree
+		      smex
                       ))
 
 (dolist (p my-packages)
@@ -208,8 +210,11 @@
 ;; (define-key map (kbd "C-c C-p") 'neotree-project-dir)
 
 ;;; smex
-(global-set-key (kbd "M-x") 'smex)
-(global-set-key (kbd "M-X") 'smex-major-mode-commands)
+;; (global-set-key (kbd "M-x") 'smex)
+;; (global-set-key (kbd "M-X") 'smex-major-mode-commands)
+(require 'helm-smex)
+(global-set-key [remap execute-extended-command] #'helm-smex)
+(global-set-key (kbd "M-X") #'helm-smex-major-mode-commands)
 
 ;;; nyan-mode
 ;; (require 'nyan-mode)
@@ -454,8 +459,8 @@
 (add-hook 'web-mode-hook 'my-web-mode-hook)
 
 ;; My Coffee AC Source
-(add-to-list 'load-path "/Users/jordanto/dev/emacs/ac-coffee")
-(require 'ac-coffee)
+;; (add-to-list 'load-path "/Users/jordanto/dev/emacs/ac-coffee")
+;; (require 'ac-coffee)
 
 (eval-after-load 'js
   '(define-key js-mode-map "{" 'paredit-open-curly))
@@ -626,7 +631,10 @@ Version 2016-07-04"
  ;; If there is more than one, they won't work right.
  '(custom-safe-themes
    (quote
-    ("0e219d63550634bc5b0c214aced55eb9528640377daf486e13fb18a32bf39856" default))))
+    ("2a739405edf418b8581dcd176aaf695d319f99e3488224a3c495cb0f9fd814e3" "0e219d63550634bc5b0c214aced55eb9528640377daf486e13fb18a32bf39856" default)))
+ '(package-selected-packages
+   (quote
+    (helm-smex zenburn-theme web-mode web-beautify toggle-quotes tide scss-mode scpaste rainbow-delimiters paredit ox-gfm nyan-mode neotree markdown-mode magit less-css-mode json-mode js2-refactor js-comint ido-ubiquitous idle-highlight-mode helm-projectile flx-ido find-file-in-project feature-mode exec-path-from-shell ember-mode editorconfig company-tern coffee-mode clojurescript-mode cider-spy cider-profile cider-eval-sexp-fu cider-decompile better-defaults ac-nrepl ac-js2 ac-emmet ac-cider))))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
