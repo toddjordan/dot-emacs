@@ -58,8 +58,13 @@
                       helm-projectile
                       company-tern
 		      neotree
+		      all-the-icons
 		      smex
-                      ))
+		      eslint-fix
+		      git-timemachine
+		      ox-reveal
+		      prettier-js
+		      vlf))
 
 (dolist (p my-packages)
   (when (not (package-installed-p p))
@@ -94,7 +99,9 @@
 (column-number-mode)
 (menu-bar-mode)
 (tool-bar-mode)
-(global-hl-line-mode)
+(global-hl-line-mode 1)
+(set-face-background 'hl-line "#222")
+(set-face-attribute 'region nil :background "#666")
 ;;; desktop save mode: save your open buffers so when you close and ropen
 ;;(desktop-save-mode 1)
 (when (display-graphic-p) (scroll-bar-mode))
@@ -171,6 +178,10 @@
 
 ;;; Org Mode
 (add-hook 'org-mode-hook 'yas-minor-mode)
+(global-set-key (kbd "C-c a") 'org-agenda)
+(global-set-key (kbd "C-c l") 'org-store-link)
+(global-set-key (kbd "C-c b") 'org-iswitchb)
+(setq org-directory "~/dev/notebook")
 ;;(add-to-list 'org-file-apps '(directory . emacs))
 (setq org-agenda-files (list "~/dev/notebook/"
                              "~/dev/notebook/teams"
@@ -179,13 +190,36 @@
                              "~/dev/notebook/notes"
                              "~/dev/notebook/writing"
                              "~/dev/notebook/events"))
+(setq org-refile-targets
+      '((nil :maxlevel . 3)
+	(org-agenda-files :maxlevel . 3)))
 (setq org-tag-alist '(("projects" . ?p)
                       ("notes" . ?n)
                       ("purecloud" . ?c)
+		      ("q2" . ?q)
                       ("presentations" . ?r)
                       ("oss" . ?o)
                       ("teams" . ?t)
                       ("ember" . ?e)))
+
+;; Org Capture
+(setq org-default-notes-file (concat org-directory "/notes/notes.org"))
+;; C-c c is for capture, and that's good enough for me
+(define-key global-map "\C-cc" 'org-capture)
+;; force UTF-8
+(setq org-export-coding-system 'utf-8)
+
+(setq org-capture-templates
+      '(("t" "Todo list item"
+	 entry (file+headline org-default-notes-file "Tasks")
+	 "* TODO %?\n %i\n %a")
+       ("j" "Journal Entry"
+	entry (file+datetree "~/dev/notebook/notes/journal.org")
+	(file "~/.emacs.d/org-templates/journal.orgcaptmpl"))
+       ("b" "Tidbit: quote, zinger, one-liner or textlet"
+	entry (file+headline org-default-notes-file "Tidbits")
+	(file "~/.emacs.d/org-templates/tidbits.orgcaptmpl")))
+)
 
 ;; load github markdown export
 (eval-after-load "org"
@@ -194,8 +228,10 @@
 ;;; NeoTree
 (add-to-list 'load-path "/Users/jordanto/dev/emacs/emacs-neotree")
 (require 'neotree)
+(require 'all-the-icons)
 (global-set-key [f8] 'neotree-toggle)
 (setq neo-smart-open t)
+(setq neo-theme (if (display-graphic-p) 'icons 'arrow))
 
 ;; (defun neotree-project-dir ()
 ;;   "Open NeoTree using the git root."
@@ -275,9 +311,9 @@
 (setq js2-missing-semi-one-line-override t)
 (setq js2-strict-missing-semi-warning nil)
 
-(add-hook 'json-mode-hook (lambda ()
-                           (make-local-variable 'js-indent-level)
-                           (setq js-indent-level 2)))
+;; (add-hook 'json-mode-hook (lambda ()
+;;                            (make-local-variable 'js-indent-level)
+;;                            (setq js-indent-level 2)))
 
 
 ;; js turn function into f
@@ -393,6 +429,10 @@
 
 (add-to-list 'auto-mode-alist '("\\.ts$" . typescript-mode))
 
+;;; prettier
+(require 'prettier-js)
+(add-hook 'typescript-mode-hook 'prettier-js-mode)
+
 ;;; web beautify
 (require 'web-beautify)
 (eval-after-load 'js2-mode
@@ -437,6 +477,12 @@
 (add-to-list 'auto-mode-alist '("\\.html?\\'" . web-mode))
 (add-to-list 'auto-mode-alist '("\\.hbs?\\'" . web-mode))
 (add-to-list 'auto-mode-alist '("\\.jsx$" . web-mode))
+(add-to-list 'auto-mode-alist '("\\.tsx\\'" . web-mode))
+(add-hook 'web-mode-hook
+	  (lambda ()
+	    (when (string-equal "tsx" (file-name-extension buffer-file-name))
+	      (setup-tide-mode))))
+(flycheck-add-mode 'typescript-tslint 'web-mode)
 (defadvice web-mode-highlight-part (around tweak-jsx activate)
   (if (equal web-mode-content-type "jsx")
       (let ((web-mode-enable-part-face nil))
@@ -555,7 +601,7 @@
   (button 'defun)
   (textarea 'defun))
 
-(setq-default fill-column 200)
+(setq-default fill-column 100)
 
 ;; SCSS
 (require 'scss-mode)
@@ -632,12 +678,29 @@ Version 2016-07-04"
  '(custom-safe-themes
    (quote
     ("2a739405edf418b8581dcd176aaf695d319f99e3488224a3c495cb0f9fd814e3" "0e219d63550634bc5b0c214aced55eb9528640377daf486e13fb18a32bf39856" default)))
+ '(org-cycle-level-faces t)
+ '(org-fontify-whole-heading-line nil)
  '(package-selected-packages
    (quote
-    (helm-smex zenburn-theme web-mode web-beautify toggle-quotes tide scss-mode scpaste rainbow-delimiters paredit ox-gfm nyan-mode neotree markdown-mode magit less-css-mode json-mode js2-refactor js-comint ido-ubiquitous idle-highlight-mode helm-projectile flx-ido find-file-in-project feature-mode exec-path-from-shell ember-mode editorconfig company-tern coffee-mode clojurescript-mode cider-spy cider-profile cider-eval-sexp-fu cider-decompile better-defaults ac-nrepl ac-js2 ac-emmet ac-cider))))
+    (all-the-icons all-the-icons-dired vlf prettier-js ox-reveal git-timemachine eslint-fix helm-smex zenburn-theme web-mode web-beautify toggle-quotes tide scss-mode scpaste rainbow-delimiters paredit ox-gfm nyan-mode neotree markdown-mode magit less-css-mode json-mode js2-refactor js-comint ido-ubiquitous idle-highlight-mode helm-projectile flx-ido find-file-in-project feature-mode exec-path-from-shell ember-mode editorconfig company-tern coffee-mode clojurescript-mode cider-spy cider-profile cider-eval-sexp-fu cider-decompile better-defaults ac-nrepl ac-js2 ac-emmet ac-cider))))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
- )
+ '(org-level-1 ((t (:foreground "#DFAF8F" :height 1.5))))
+ '(org-level-2 ((t (:foreground "#BFEBBF" :height 1.4))))
+ '(org-level-3 ((t (:foreground "#7CB8BB" :height 1.3))))
+ '(org-level-4 ((t (:foreground "#D0BF8F" :height 1.2))))
+ '(org-level-5 ((t (:foreground "#93E0E3" :height 1.1)))))
+
+(defun delete-file-and-buffer ()
+  "Kill the current buffer and delete the file being visited."
+  (interactive)
+  (let ((filename (buffer-file-name)))
+    (when filename
+      	(progn
+	  (delete-file filename)
+	  (message "Deleted file %s" filename)
+	  (kill-buffer)))))
+(global-set-key (kbd "C-c D") 'delete-file-and-buffer)

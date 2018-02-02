@@ -14,4 +14,5 @@ A couple of the packages I install rely on globally installed modules:
 
 - `npm install -g tern` for the ternjs code analysis javascript engine
 - `npm install -g eslint` for eslint checking
-
+- `npm install -g prettier` for more linting/formatting
+- `brew install aspell` for spell checking
