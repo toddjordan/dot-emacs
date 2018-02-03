@@ -7,3 +7,9 @@ backups
 eshell
 .mc-lists.el
 .tern-project
+.org-id-locations
+bookmarks
+projectile-bookmarks.eld
+projectile.cache
+recentf
+smex-items
