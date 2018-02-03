@@ -57,14 +57,15 @@
                       editorconfig
                       helm-projectile
                       company-tern
-		      neotree
-		      all-the-icons
-		      smex
-		      eslint-fix
-		      git-timemachine
-		      ox-reveal
-		      prettier-js
-		      vlf))
+											neotree
+											all-the-icons
+											smex
+											eslint-fix
+											git-timemachine
+											ox-reveal
+											prettier-js
+											vlf
+											powerline))
 
 (dolist (p my-packages)
   (when (not (package-installed-p p))
@@ -233,6 +234,9 @@
 (setq neo-smart-open t)
 (setq neo-theme (if (display-graphic-p) 'icons 'arrow))
 
+(require 'all-the-icons-dired)
+(add-hook 'dired-mode-hook 'all-the-icons-dired-mode)
+
 ;; (defun neotree-project-dir ()
 ;;   "Open NeoTree using the git root."
 ;;   (interactive)
@@ -248,6 +252,12 @@
 ;;; smex
 ;; (global-set-key (kbd "M-x") 'smex)
 ;; (global-set-key (kbd "M-X") 'smex-major-mode-commands)
+
+;;; powerline
+(require 'powerline)
+(powerline-default-theme)
+
+;;; helm smex
 (require 'helm-smex)
 (global-set-key [remap execute-extended-command] #'helm-smex)
 (global-set-key (kbd "M-X") #'helm-smex-major-mode-commands)
@@ -676,18 +686,19 @@ Version 2016-07-04"
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
  '(custom-safe-themes
-   (quote
-    ("2a739405edf418b8581dcd176aaf695d319f99e3488224a3c495cb0f9fd814e3" "0e219d63550634bc5b0c214aced55eb9528640377daf486e13fb18a32bf39856" default)))
+	 (quote
+		("2a739405edf418b8581dcd176aaf695d319f99e3488224a3c495cb0f9fd814e3" "0e219d63550634bc5b0c214aced55eb9528640377daf486e13fb18a32bf39856" default)))
  '(org-cycle-level-faces t)
  '(org-fontify-whole-heading-line nil)
  '(package-selected-packages
-   (quote
-    (all-the-icons all-the-icons-dired vlf prettier-js ox-reveal git-timemachine eslint-fix helm-smex zenburn-theme web-mode web-beautify toggle-quotes tide scss-mode scpaste rainbow-delimiters paredit ox-gfm nyan-mode neotree markdown-mode magit less-css-mode json-mode js2-refactor js-comint ido-ubiquitous idle-highlight-mode helm-projectile flx-ido find-file-in-project feature-mode exec-path-from-shell ember-mode editorconfig company-tern coffee-mode clojurescript-mode cider-spy cider-profile cider-eval-sexp-fu cider-decompile better-defaults ac-nrepl ac-js2 ac-emmet ac-cider))))
+	 (quote
+		(powerline all-the-icons all-the-icons-dired vlf prettier-js ox-reveal git-timemachine eslint-fix helm-smex zenburn-theme web-mode web-beautify toggle-quotes tide scss-mode scpaste rainbow-delimiters paredit ox-gfm nyan-mode neotree markdown-mode magit less-css-mode json-mode js2-refactor js-comint ido-ubiquitous idle-highlight-mode helm-projectile flx-ido find-file-in-project feature-mode exec-path-from-shell ember-mode editorconfig company-tern coffee-mode clojurescript-mode cider-spy cider-profile cider-eval-sexp-fu cider-decompile better-defaults ac-nrepl ac-js2 ac-emmet ac-cider))))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
+ '(helm-source-header ((t (:background "#2B2B2B" :foreground "#F0DFAF" :box (:line-width -1 :style released-button) :underline nil :weight bold :height 1.5))))
  '(org-level-1 ((t (:foreground "#DFAF8F" :height 1.5))))
  '(org-level-2 ((t (:foreground "#BFEBBF" :height 1.4))))
  '(org-level-3 ((t (:foreground "#7CB8BB" :height 1.3))))
