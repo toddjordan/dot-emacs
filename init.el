@@ -57,15 +57,15 @@
                       editorconfig
                       helm-projectile
                       company-tern
-											neotree
-											all-the-icons
-											smex
-											eslint-fix
-											git-timemachine
-											ox-reveal
-											prettier-js
-											vlf
-											powerline))
+		      neotree
+		      all-the-icons
+		      smex
+		      eslint-fix
+		      git-timemachine
+		      ox-reveal
+		      prettier-js
+		      vlf
+		      powerline))
 
 (dolist (p my-packages)
   (when (not (package-installed-p p))
@@ -355,6 +355,7 @@
 
 (add-hook 'js2-mode-hook 'my-paredit-nonlisp) ;use with the above function
 (add-hook 'coffee-mode-hook 'my-paredit-nonlisp)
+(add-hook 'json-mode-hook 'my-paredit-nonlisp)
 (electric-pair-mode)
 
 ;;; jshint with flycheck
@@ -376,6 +377,12 @@
 (setq-default flycheck-disabled-checkers
   (append flycheck-disabled-checkers
     '(json-jsonlist)))
+
+
+;; flycheck-color-mode-line
+(require 'flycheck-color-mode-line)
+(eval-after-load "flycheck"
+  '(add-hook 'flycheck-mode-hook 'flycheck-color-mode-line-mode))
 
 ;; https://github.com/purcell/exec-path-from-shell
 ;; only need exec-path-from-shell on OSX
@@ -417,8 +424,11 @@
 (add-hook 'lisp-interaction-mode-hook #'enable-paredit-mode)
 (add-hook 'scheme-mode-hook           #'enable-paredit-mode)
 
+;;; prettier
+(require 'prettier-js)
+;; (add-hook 'typescript-mode-hook 'prettier-js-mode)
 
-;; Typescript (Tide)
+;;; Typescript (Tide)
 
 (defun setup-tide-mode ()
   (interactive)
@@ -427,7 +437,9 @@
   (setq flycheck-check-syntax-automatically '(save mode-enabled))
   (eldoc-mode +1)
   (tide-hl-identifier-mode +1)
-  (company-mode +1))
+  (company-mode +1)
+	(prettier-js-mode +1)
+	)
 
 ;; aligns annotation to the right hand side
 (setq company-tooltip-align-annotations t)
@@ -436,12 +448,9 @@
 (add-hook 'before-save-hook 'tide-format-before-save)
 
 (add-hook 'typescript-mode-hook #'setup-tide-mode)
+(add-hook 'typescript-mode-hook 'my-paredit-nonlisp)
 
 (add-to-list 'auto-mode-alist '("\\.ts$" . typescript-mode))
-
-;;; prettier
-(require 'prettier-js)
-(add-hook 'typescript-mode-hook 'prettier-js-mode)
 
 ;;; web beautify
 (require 'web-beautify)
@@ -492,6 +501,7 @@
 	  (lambda ()
 	    (when (string-equal "tsx" (file-name-extension buffer-file-name))
 	      (setup-tide-mode))))
+;; enable typescript-tslint checker
 (flycheck-add-mode 'typescript-tslint 'web-mode)
 (defadvice web-mode-highlight-part (around tweak-jsx activate)
   (if (equal web-mode-content-type "jsx")
@@ -686,13 +696,13 @@ Version 2016-07-04"
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
  '(custom-safe-themes
-	 (quote
-		("2a739405edf418b8581dcd176aaf695d319f99e3488224a3c495cb0f9fd814e3" "0e219d63550634bc5b0c214aced55eb9528640377daf486e13fb18a32bf39856" default)))
+   (quote
+    ("2a739405edf418b8581dcd176aaf695d319f99e3488224a3c495cb0f9fd814e3" "0e219d63550634bc5b0c214aced55eb9528640377daf486e13fb18a32bf39856" default)))
  '(org-cycle-level-faces t)
  '(org-fontify-whole-heading-line nil)
  '(package-selected-packages
-	 (quote
-		(powerline all-the-icons all-the-icons-dired vlf prettier-js ox-reveal git-timemachine eslint-fix helm-smex zenburn-theme web-mode web-beautify toggle-quotes tide scss-mode scpaste rainbow-delimiters paredit ox-gfm nyan-mode neotree markdown-mode magit less-css-mode json-mode js2-refactor js-comint ido-ubiquitous idle-highlight-mode helm-projectile flx-ido find-file-in-project feature-mode exec-path-from-shell ember-mode editorconfig company-tern coffee-mode clojurescript-mode cider-spy cider-profile cider-eval-sexp-fu cider-decompile better-defaults ac-nrepl ac-js2 ac-emmet ac-cider))))
+   (quote
+    (flycheck-color-mode-line powerline all-the-icons all-the-icons-dired vlf prettier-js ox-reveal git-timemachine eslint-fix helm-smex zenburn-theme web-mode web-beautify toggle-quotes tide scss-mode scpaste rainbow-delimiters paredit ox-gfm nyan-mode neotree markdown-mode magit less-css-mode json-mode js2-refactor js-comint ido-ubiquitous idle-highlight-mode helm-projectile flx-ido find-file-in-project feature-mode exec-path-from-shell ember-mode editorconfig company-tern coffee-mode clojurescript-mode cider-spy cider-profile cider-eval-sexp-fu cider-decompile better-defaults ac-nrepl ac-js2 ac-emmet ac-cider))))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
