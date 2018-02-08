@@ -65,7 +65,8 @@
 		      ox-reveal
 		      prettier-js
 		      vlf
-		      powerline))
+		      powerline
+		      diminish))
 
 (dolist (p my-packages)
   (when (not (package-installed-p p))
@@ -96,6 +97,15 @@
 
 (set-frame-size-according-to-resolution)
 
+;; hide stuff from modeline
+(require 'diminish)
+(add-to-list 'emacs-startup-hook
+             (lambda ()
+	       (diminish 'company-mode)
+	       (diminish 'editorconfig-mode)
+	       (diminish 'eldoc-mode)
+	       (diminish 'paredit-mode)))
+
 ;; General Config
 (column-number-mode)
 (menu-bar-mode)
@@ -104,10 +114,41 @@
 (set-face-background 'hl-line "#222")
 (set-face-attribute 'region nil :background "#666")
 ;;; desktop save mode: save your open buffers so when you close and ropen
-;;(desktop-save-mode 1)
+;;;(desktop-save-mode 1)
 (when (display-graphic-p) (scroll-bar-mode))
 (when (not (display-graphic-p))(remove-hook 'prog-mode-hook 'esk-turn-on-hl-line-mode))
 (when (display-graphic-p) (x-focus-frame nil))
+
+;;; support mouse functions in iterm
+(defvar alternating-scroll-down-next t)
+(defvar alternating-scroll-up-next t)
+
+(defun alternating-scroll-down-line ()
+  (interactive "@")
+    (when alternating-scroll-down-next
+;      (run-hook-with-args 'window-scroll-functions )
+      (scroll-down-line))
+    (setq alternating-scroll-down-next (not alternating-scroll-down-next)))
+
+(defun alternating-scroll-up-line ()
+  (interactive "@")
+    (when alternating-scroll-up-next
+;      (run-hook-with-args 'window-scroll-functions)
+      (scroll-up-line))
+    (setq alternating-scroll-up-next (not alternating-scroll-up-next)))
+
+(when (not (display-graphic-p))
+  (xterm-mouse-mode t)
+  (defun track-mouse (e))
+  (setq mouse-sel-mode t)
+	(setq mouse-wheel-follow-mouse 't)
+	
+	(global-set-key (kbd "<mouse-4>") 'alternating-scroll-down-line)
+	(global-set-key (kbd "<mouse-5>") 'alternating-scroll-up-line)
+
+)
+
+
 (global-linum-mode 1)
 (global-prettify-symbols-mode +1)
 (global-set-key [backspace] 'delete-backward-char)
@@ -146,7 +187,7 @@
 
 ;; (load-theme 'tsdh-dark)
 (add-to-list 'custom-theme-load-path "~/.emacs.d/themes/")
-(load-theme 'zenburn)
+(load-theme 'zenburn t)
 
 ;;;ido
 (ido-mode 1)
@@ -360,12 +401,18 @@
 
 ;;; jshint with flycheck
 (require 'flycheck)
-(add-hook 'js2-mode-hook
-          (lambda () (flycheck-mode t)))
+(global-flycheck-mode)
 ;; disable jshint since we prefer eslint checking
 (setq-default flycheck-disabled-checkers
   (append flycheck-disabled-checkers
     '(javascript-jshint)))
+
+(add-hook 'js2-mode-hook
+          (lambda ()
+	    (flycheck-select-checker 'javascript-eslint)
+	    (flycheck-mode t)
+	    (add-hook 'after-save-hook 'eslint-fix nil t)
+	    ))
 
 ;; use eslint with web-mode for jsx files
 (flycheck-add-mode 'javascript-eslint 'web-mode)
@@ -384,15 +431,21 @@
 (eval-after-load "flycheck"
   '(add-hook 'flycheck-mode-hook 'flycheck-color-mode-line-mode))
 
+(add-to-list 'display-buffer-alist
+	     `(,(rx bos "*Flycheck errors*" eos)
+	       (display-buffer-reuse-window
+		display-buffer-in-side-window)
+	       (side            . bottom)
+	       (reusable-frames . visible)
+	       (window-height   . 0.25)))
+
 ;; https://github.com/purcell/exec-path-from-shell
 ;; only need exec-path-from-shell on OSX
 ;; this hopefully sets up path and other vars better
 (when (memq window-system '(mac ns))
   (exec-path-from-shell-initialize))
 
-;; eslint --fix on save
-(eval-after-load 'js2-mode
-  '(add-hook 'js2-mode-hook (lambda () (add-hook 'after-save-hook 'eslint-fix nil t))))
+
 
 ;;; ember-mode
 (add-to-list 'load-path "~/.emacs.d/ember-mode/")
@@ -702,7 +755,7 @@ Version 2016-07-04"
  '(org-fontify-whole-heading-line nil)
  '(package-selected-packages
    (quote
-    (flycheck-color-mode-line powerline all-the-icons all-the-icons-dired vlf prettier-js ox-reveal git-timemachine eslint-fix helm-smex zenburn-theme web-mode web-beautify toggle-quotes tide scss-mode scpaste rainbow-delimiters paredit ox-gfm nyan-mode neotree markdown-mode magit less-css-mode json-mode js2-refactor js-comint ido-ubiquitous idle-highlight-mode helm-projectile flx-ido find-file-in-project feature-mode exec-path-from-shell ember-mode editorconfig company-tern coffee-mode clojurescript-mode cider-spy cider-profile cider-eval-sexp-fu cider-decompile better-defaults ac-nrepl ac-js2 ac-emmet ac-cider))))
+    (diminish flycheck-color-mode-line powerline all-the-icons all-the-icons-dired vlf prettier-js ox-reveal git-timemachine eslint-fix helm-smex zenburn-theme web-mode web-beautify toggle-quotes tide scss-mode scpaste rainbow-delimiters paredit ox-gfm nyan-mode neotree markdown-mode magit less-css-mode json-mode js2-refactor js-comint ido-ubiquitous idle-highlight-mode helm-projectile flx-ido find-file-in-project feature-mode exec-path-from-shell ember-mode editorconfig company-tern coffee-mode clojurescript-mode cider-spy cider-profile cider-eval-sexp-fu cider-decompile better-defaults ac-nrepl ac-js2 ac-emmet ac-cider))))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
@@ -715,6 +768,7 @@ Version 2016-07-04"
  '(org-level-4 ((t (:foreground "#D0BF8F" :height 1.2))))
  '(org-level-5 ((t (:foreground "#93E0E3" :height 1.1)))))
 
+;;; I like to kill and buffer and delete it at the same time
 (defun delete-file-and-buffer ()
   "Kill the current buffer and delete the file being visited."
   (interactive)
@@ -725,3 +779,11 @@ Version 2016-07-04"
 	  (message "Deleted file %s" filename)
 	  (kill-buffer)))))
 (global-set-key (kbd "C-c D") 'delete-file-and-buffer)
+
+;;; Instant access to init.el
+(defun find-user-init-file ()
+  "Edit init.el"
+  (interactive)
+  (find-file-other-frame user-init-file))
+
+(global-set-key (kbd "C-c I") 'find-user-init-file)
