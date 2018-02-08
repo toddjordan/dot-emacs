@@ -104,7 +104,11 @@
 	       (diminish 'company-mode)
 	       (diminish 'editorconfig-mode)
 	       (diminish 'eldoc-mode)
-	       (diminish 'paredit-mode)))
+	       (diminish 'paredit-mode)
+	       (diminish 'whitespace-mode)
+	       (diminish 'tern-mode)
+	       (diminish 'ember-mode)
+	       (diminish 'auto-complete-mode)))
 
 ;; General Config
 (column-number-mode)
@@ -414,9 +418,6 @@
 	    (add-hook 'after-save-hook 'eslint-fix nil t)
 	    ))
 
-;; use eslint with web-mode for jsx files
-(flycheck-add-mode 'javascript-eslint 'web-mode)
-
 ;; customize flycheck temp file prefix
 (setq-default flycheck-temp-prefix ".flycheck")
 
@@ -556,8 +557,12 @@
 	      (setup-tide-mode))))
 ;; enable typescript-tslint checker
 (flycheck-add-mode 'typescript-tslint 'web-mode)
+;; I want this for jsx but not hbs
+;;(flycheck-add-mode 'javascript-eslint 'web-mode)
+
 (defadvice web-mode-highlight-part (around tweak-jsx activate)
   (if (equal web-mode-content-type "jsx")
+
       (let ((web-mode-enable-part-face nil))
         ad-do-it)
     ad-do-it))
