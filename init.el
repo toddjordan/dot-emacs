@@ -67,7 +67,10 @@
 		      vlf
 		      powerline
 		      diminish
-		      ibuffer-vc))
+		      ibuffer-vc
+		      helm-ag
+		      elm-mode
+		      elm-yasnippets))
 
 (dolist (p my-packages)
   (when (not (package-installed-p p))
@@ -153,6 +156,17 @@
 
 )
 
+(defun copy-from-osx ()
+  (shell-command-to-string "pbpaste"))
+
+(defun paste-to-osx (text &optional push)
+  (let ((process-connection-type nil))
+    (let ((proc (start-process "pbcopy" "*Messages*" "pbcopy")))
+      (process-send-string proc text)
+      (process-send-eof proc))))
+
+(setq interprogram-cut-function 'paste-to-osx)
+(setq interprogram-paste-function 'copy-from-osx)
 
 (global-linum-mode 1)
 (global-prettify-symbols-mode +1)
@@ -481,6 +495,7 @@
 (add-hook 'lisp-mode-hook             #'enable-paredit-mode)
 (add-hook 'lisp-interaction-mode-hook #'enable-paredit-mode)
 (add-hook 'scheme-mode-hook           #'enable-paredit-mode)
+(add-hook 'elm-mode-hook              #'enable-paredit-mode)
 
 ;;; prettier
 (require 'prettier-js)
@@ -496,8 +511,8 @@
   (eldoc-mode +1)
   (tide-hl-identifier-mode +1)
   (company-mode +1)
-	(prettier-js-mode +1)
-	)
+  (prettier-js-mode +1)
+  )
 
 ;; aligns annotation to the right hand side
 (setq company-tooltip-align-annotations t)
@@ -607,6 +622,11 @@
 (autoload 'gfm-mode "gfm-mode"
    "Major mode for editing GitHub Flavored Markdown files" t)
 (add-to-list 'auto-mode-alist '("README\\.md\\'" . gfm-mode))
+
+;;; elm
+(add-to-list 'company-backends 'company-elm)
+(add-hook 'elm-mode-hook 'company-mode)
+(setq elm-format-on-save t)
 
 ;;; CIDER
 (require 'cider-mode)
@@ -764,7 +784,7 @@ Version 2016-07-04"
  '(org-fontify-whole-heading-line nil)
  '(package-selected-packages
    (quote
-    (ibuffer-vc diminish flycheck-color-mode-line powerline all-the-icons all-the-icons-dired vlf prettier-js ox-reveal git-timemachine eslint-fix helm-smex zenburn-theme web-mode web-beautify toggle-quotes tide scss-mode scpaste rainbow-delimiters paredit ox-gfm nyan-mode neotree markdown-mode magit less-css-mode json-mode js2-refactor js-comint ido-ubiquitous idle-highlight-mode helm-projectile flx-ido find-file-in-project feature-mode exec-path-from-shell ember-mode editorconfig company-tern coffee-mode clojurescript-mode cider-spy cider-profile cider-eval-sexp-fu cider-decompile better-defaults ac-nrepl ac-js2 ac-emmet ac-cider))))
+    (elm-mode elm-yasnippets helm-ag ibuffer-vc diminish flycheck-color-mode-line powerline all-the-icons all-the-icons-dired vlf prettier-js ox-reveal git-timemachine eslint-fix helm-smex zenburn-theme web-mode web-beautify toggle-quotes tide scss-mode scpaste rainbow-delimiters paredit ox-gfm nyan-mode neotree markdown-mode magit less-css-mode json-mode js2-refactor js-comint ido-ubiquitous idle-highlight-mode helm-projectile flx-ido find-file-in-project feature-mode exec-path-from-shell ember-mode editorconfig company-tern coffee-mode clojurescript-mode cider-spy cider-profile cider-eval-sexp-fu cider-decompile better-defaults ac-nrepl ac-js2 ac-emmet ac-cider))))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
