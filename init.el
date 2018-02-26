@@ -58,19 +58,21 @@
                       helm-projectile
                       company-tern
 		      neotree
-		      all-the-icons
-		      smex
-		      eslint-fix
-		      git-timemachine
-		      ox-reveal
-		      prettier-js
-		      vlf
-		      powerline
-		      diminish
-		      ibuffer-vc
-		      helm-ag
-		      elm-mode
-		      elm-yasnippets))
+                      all-the-icons
+                      smex
+                      eslint-fix
+                      git-timemachine
+                      ox-reveal
+                      prettier-js
+                      vlf
+                      powerline
+                      diminish
+                      ibuffer-vc
+                      helm-ag
+                      elm-mode
+                      elm-yasnippets
+                      docker
+                      dockerfile-mode))
 
 (dolist (p my-packages)
   (when (not (package-installed-p p))
@@ -119,6 +121,7 @@
 (menu-bar-mode)
 (tool-bar-mode)
 (global-hl-line-mode 1)
+(setq-default indent-tabs-mode nil)
 (set-face-background 'hl-line "#222")
 (set-face-attribute 'region nil :background "#666")
 ;;; desktop save mode: save your open buffers so when you close and ropen
@@ -473,7 +476,7 @@
 (add-hook 'web-mode-hook (lambda () (ember-mode t)))
 
 ;;; coffeescript
-(setq coffee-tab-width 4)
+;; (setq coffee-tab-width 4)
 (add-hook 'coffee-mode-hook
           (lambda () (flycheck-mode t)))
 
@@ -780,11 +783,12 @@ Version 2016-07-04"
  '(custom-safe-themes
    (quote
     ("2a739405edf418b8581dcd176aaf695d319f99e3488224a3c495cb0f9fd814e3" "0e219d63550634bc5b0c214aced55eb9528640377daf486e13fb18a32bf39856" default)))
+ '(inhibit-startup-screen t)
  '(org-cycle-level-faces t)
  '(org-fontify-whole-heading-line nil)
  '(package-selected-packages
    (quote
-    (elm-mode elm-yasnippets helm-ag ibuffer-vc diminish flycheck-color-mode-line powerline all-the-icons all-the-icons-dired vlf prettier-js ox-reveal git-timemachine eslint-fix helm-smex zenburn-theme web-mode web-beautify toggle-quotes tide scss-mode scpaste rainbow-delimiters paredit ox-gfm nyan-mode neotree markdown-mode magit less-css-mode json-mode js2-refactor js-comint ido-ubiquitous idle-highlight-mode helm-projectile flx-ido find-file-in-project feature-mode exec-path-from-shell ember-mode editorconfig company-tern coffee-mode clojurescript-mode cider-spy cider-profile cider-eval-sexp-fu cider-decompile better-defaults ac-nrepl ac-js2 ac-emmet ac-cider))))
+    (docker dockerfile-mode helm-ag ibuffer-vc diminish flycheck-color-mode-line powerline all-the-icons all-the-icons-dired vlf prettier-js ox-reveal git-timemachine eslint-fix helm-smex zenburn-theme web-mode web-beautify toggle-quotes tide scss-mode scpaste rainbow-delimiters paredit ox-gfm nyan-mode neotree markdown-mode magit less-css-mode json-mode js2-refactor js-comint ido-ubiquitous idle-highlight-mode helm-projectile flx-ido find-file-in-project feature-mode exec-path-from-shell ember-mode editorconfig company-tern coffee-mode clojurescript-mode cider-spy cider-profile cider-eval-sexp-fu cider-decompile better-defaults ac-nrepl ac-js2 ac-emmet ac-cider))))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
