@@ -1,12 +1,12 @@
 (require 'package)
 (setq package-archives '(("marmalade" . "https://marmalade-repo.org/packages/")
                          ("melpa" . "http://melpa.org/packages/")
-                         ("gnu" . "https://elpa.gnu.org/packages/")))
+                         ("gnu" . "https://elpa.gnu.org/packages/")
+                         ("org" . "http://orgmode.org/elpa/")))
 (package-initialize)
 
 (when (not package-archive-contents)
   (package-refresh-contents))
-
 (defvar my-packages '(better-defaults
                       paredit
                       idle-highlight-mode
@@ -57,7 +57,7 @@
                       editorconfig
                       helm-projectile
                       company-tern
-		      neotree
+                      neotree
                       all-the-icons
                       smex
                       eslint-fix
@@ -72,7 +72,8 @@
                       elm-mode
                       elm-yasnippets
                       docker
-                      dockerfile-mode))
+                      dockerfile-mode
+                      ))
 
 (dolist (p my-packages)
   (when (not (package-installed-p p))
@@ -102,6 +103,13 @@
                                     (frame-char-height)))))))
 
 (set-frame-size-according-to-resolution)
+
+;; https://github.com/purcell/exec-path-from-shell
+;; only need exec-path-from-shell on OSX
+;; this hopefully sets up path and other vars better
+(when (memq window-system '(mac ns x))
+  (exec-path-from-shell-initialize))
+
 
 ;; hide stuff from modeline
 (require 'diminish)
@@ -178,6 +186,23 @@
 (setq tab-width 2)
 (setq ispell-program-name "/usr/local/bin/aspell")
 (global-set-key (kbd "C-c j") 'just-one-space)
+
+(setq helm-ag-use-agignore t)
+(custom-set-variables
+ ;; custom-set-variables was added by Custom.
+ ;; If you edit it by hand, you could mess it up, so be careful.
+ ;; Your init file should contain only one such instance.
+ ;; If there is more than one, they won't work right.
+ '(custom-safe-themes
+   (quote
+    ("2a739405edf418b8581dcd176aaf695d319f99e3488224a3c495cb0f9fd814e3" "0e219d63550634bc5b0c214aced55eb9528640377daf486e13fb18a32bf39856" default)))
+ '(helm-ag-ignore-patterns (quote ("\\node_modules\\'" "\\CHANGELOG\\'" "\\tmp\\'")))
+ '(inhibit-startup-screen t)
+ '(org-cycle-level-faces t)
+ '(org-fontify-whole-heading-line nil)
+ '(package-selected-packages
+   (quote
+    (htmlize org docker dockerfile-mode helm-ag ibuffer-vc diminish flycheck-color-mode-line powerline all-the-icons all-the-icons-dired vlf prettier-js ox-reveal git-timemachine eslint-fix helm-smex zenburn-theme web-mode web-beautify toggle-quotes tide scss-mode scpaste rainbow-delimiters paredit ox-gfm nyan-mode neotree markdown-mode magit less-css-mode json-mode js2-refactor js-comint ido-ubiquitous idle-highlight-mode helm-projectile flx-ido find-file-in-project feature-mode exec-path-from-shell ember-mode editorconfig company-tern coffee-mode clojurescript-mode cider-spy cider-profile cider-eval-sexp-fu cider-decompile better-defaults ac-nrepl ac-js2 ac-emmet ac-cider))))
 
 ;; increase/decrease font size
 (global-set-key (kbd "C-+") 'text-scale-increase)
@@ -263,7 +288,7 @@
 (setq org-tag-alist '(("projects" . ?p)
                       ("notes" . ?n)
                       ("purecloud" . ?c)
-		      ("q2" . ?q)
+                      ("q2" . ?q)
                       ("presentations" . ?r)
                       ("oss" . ?o)
                       ("teams" . ?t)
@@ -424,20 +449,36 @@
 (add-hook 'json-mode-hook 'my-paredit-nonlisp)
 (electric-pair-mode)
 
+
 ;;; jshint with flycheck
 (require 'flycheck)
 (global-flycheck-mode)
+;; use local eslint from node_modules before global
+;; http://emacs.stackexchange.com/questions/21205/flycheck-with-file-relative-eslint-executable
+(add-hook 'flycheck-mode-hook (lambda ()
+                                (let* ((root (locate-dominating-file
+                                              (or (buffer-file-name) default-directory)
+                                              "node_modules"))
+                                       (eslint (and root
+                                                    (expand-file-name "node_modules/.bin/eslint"
+                                                                      root))))
+                                  (when (and eslint (file-executable-p eslint))
+                                    (setq-local flycheck-javascript-eslint-executable eslint)
+                                    (setq-local eslint-fix-executable eslint)))))
+
+
+
 ;; disable jshint since we prefer eslint checking
 (setq-default flycheck-disabled-checkers
-  (append flycheck-disabled-checkers
-    '(javascript-jshint)))
+              (append flycheck-disabled-checkers
+                      '(javascript-jshint)))
+(add-hook 'js2-mode-hook (lambda ()
+                           (flycheck-mode t)
+                           (add-hook 'after-save-hook 'eslint-fix nil t)
+                           (flycheck-select-checker 'javascript-eslint)
+))
 
-(add-hook 'js2-mode-hook
-          (lambda ()
-	    (flycheck-select-checker 'javascript-eslint)
-	    (flycheck-mode t)
-	    (add-hook 'after-save-hook 'eslint-fix nil t)
-	    ))
+(flycheck-add-mode 'javascript-eslint 'js2-mode)
 
 ;; customize flycheck temp file prefix
 (setq-default flycheck-temp-prefix ".flycheck")
@@ -446,7 +487,6 @@
 (setq-default flycheck-disabled-checkers
   (append flycheck-disabled-checkers
     '(json-jsonlist)))
-
 
 ;; flycheck-color-mode-line
 (require 'flycheck-color-mode-line)
@@ -460,13 +500,6 @@
 	       (side            . bottom)
 	       (reusable-frames . visible)
 	       (window-height   . 0.25)))
-
-;; https://github.com/purcell/exec-path-from-shell
-;; only need exec-path-from-shell on OSX
-;; this hopefully sets up path and other vars better
-(when (memq window-system '(mac ns))
-  (exec-path-from-shell-initialize))
-
 
 
 ;;; ember-mode
@@ -582,6 +615,18 @@
 ;; I want this for jsx but not hbs
 ;;(flycheck-add-mode 'javascript-eslint 'web-mode)
 
+(defun enable-minor-mode (my-pair)
+  "Enable minor mode if filename match the regexp.  MY-PAIR is a cons cell (regexp . minor-mode)."
+  (if (buffer-file-name)
+      (if (string-match (car my-pair) buffer-file-name)
+          (funcall (cdr my-pair)))))
+
+(add-hook 'web-mode-hook #'(lambda ()
+                             (enable-minor-mode
+                              '("\\.tsx?\\'" . prettier-js-mode))
+                             (enable-minor-mode
+                              '("\\.jsx?\\'" . prettier-js-mode))))
+
 (defadvice web-mode-highlight-part (around tweak-jsx activate)
   (if (equal web-mode-content-type "jsx")
 
@@ -613,18 +658,23 @@
 (eval-after-load 'js
   '(define-key js-mode-map "}" 'paredit-close-curly-and-newline))
 
+(eval-after-load 'ts
+  '(define-key tide-mode-map "{" 'paredit-open-curly))
+(eval-after-load 'ts
+  '(define-key tide-mode-map "}" 'paredit-close-curly-and-newline))
+
 ;; Markdown mode
 (autoload 'markdown-mode "markdown-mode"
-   "Major mode for editing Markdown files" t)
+  "Major mode for editing Markdown files" t)
+(autoload 'gfm-mode "gfm-mode"
+   "Major mode for editing GitHub Flavored Markdown files" t)
+
 (add-to-list 'auto-mode-alist '("\\.text\\'" . markdown-mode))
 (add-to-list 'auto-mode-alist '("\\.markdown\\'" . markdown-mode))
 (add-to-list 'auto-mode-alist '("\\.md\\'" . markdown-mode))
 ;; (add-hook 'markdown-mode-hook 'turn-on-auto-fill)
 (add-hook 'markdown-mode-hook 'flyspell-mode)
-
-(autoload 'gfm-mode "gfm-mode"
-   "Major mode for editing GitHub Flavored Markdown files" t)
-(add-to-list 'auto-mode-alist '("README\\.md\\'" . gfm-mode))
+(add-hook 'markdown-mode-hook 'gfm-mode)
 
 ;;; elm
 (add-to-list 'company-backends 'company-elm)
@@ -632,7 +682,7 @@
 (setq elm-format-on-save t)
 
 ;;; CIDER
-(require 'cider-mode)
+;;(require 'cider-mode)
 
 ;; (add-to-list 'exec-path "/usr/local/bin")
 (setenv "PATH" (concat (getenv "PATH") ":/usr/local/bin"))
@@ -668,7 +718,7 @@
 ;; (eval-after-load "cider"
 ;;   '(define-key cider-mode-map (kbd "C-c C-d") 'ac-nrepl-popup-doc))
 
-(require 'ac-cider)
+;;(require 'ac-cider)
 (add-hook 'cider-mode-hook 'ac-flyspell-workaround)
 (add-hook 'cider-mode-hook 'ac-cider-setup)
 (add-hook 'cider-repl-mode-hook 'ac-cider-setup)
@@ -707,7 +757,6 @@
   (textarea 'defun))
 
 (setq-default fill-column 100)
-
 ;; SCSS
 (require 'scss-mode)
 (setq scss-sass-command "node-sass")
@@ -775,26 +824,15 @@ Version 2016-07-04"
 ;; toggle-quotes
 (require 'toggle-quotes)
 (global-set-key (kbd "C-'") 'toggle-quotes)
-(custom-set-variables
- ;; custom-set-variables was added by Custom.
- ;; If you edit it by hand, you could mess it up, so be careful.
- ;; Your init file should contain only one such instance.
- ;; If there is more than one, they won't work right.
- '(custom-safe-themes
-   (quote
-    ("2a739405edf418b8581dcd176aaf695d319f99e3488224a3c495cb0f9fd814e3" "0e219d63550634bc5b0c214aced55eb9528640377daf486e13fb18a32bf39856" default)))
- '(inhibit-startup-screen t)
- '(org-cycle-level-faces t)
- '(org-fontify-whole-heading-line nil)
- '(package-selected-packages
-   (quote
-    (docker dockerfile-mode helm-ag ibuffer-vc diminish flycheck-color-mode-line powerline all-the-icons all-the-icons-dired vlf prettier-js ox-reveal git-timemachine eslint-fix helm-smex zenburn-theme web-mode web-beautify toggle-quotes tide scss-mode scpaste rainbow-delimiters paredit ox-gfm nyan-mode neotree markdown-mode magit less-css-mode json-mode js2-refactor js-comint ido-ubiquitous idle-highlight-mode helm-projectile flx-ido find-file-in-project feature-mode exec-path-from-shell ember-mode editorconfig company-tern coffee-mode clojurescript-mode cider-spy cider-profile cider-eval-sexp-fu cider-decompile better-defaults ac-nrepl ac-js2 ac-emmet ac-cider))))
+
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
  '(helm-source-header ((t (:background "#2B2B2B" :foreground "#F0DFAF" :box (:line-width -1 :style released-button) :underline nil :weight bold :height 1.5))))
+ '(org-document-info ((t (:foreground "#8CD0D3" :height 1.5))))
+ '(org-document-title ((t (:foreground "#8CD0D3" :height 2.0))))
  '(org-level-1 ((t (:foreground "#DFAF8F" :height 1.5))))
  '(org-level-2 ((t (:foreground "#BFEBBF" :height 1.4))))
  '(org-level-3 ((t (:foreground "#7CB8BB" :height 1.3))))
@@ -813,6 +851,10 @@ Version 2016-07-04"
 	  (kill-buffer)))))
 (global-set-key (kbd "C-c D") 'delete-file-and-buffer)
 
+;;; Org reveal
+(require 'ox-reveal)
+(setq org-reveal-location "file:///Users/tjordan/dev/reveal.js")
+
 ;;; Instant access to init.el
 (defun find-user-init-file ()
   "Edit init.el"
@@ -820,3 +862,4 @@ Version 2016-07-04"
   (find-file-other-frame user-init-file))
 
 (global-set-key (kbd "C-c I") 'find-user-init-file)
+
